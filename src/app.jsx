@@ -1,44 +1,29 @@
-import React, { useEffect, useState } from "react";
-import VideoList from "./components/video_list/video_list";
-import "@fortawesome/fontawesome-free/js/all.js";
-import "./app.css";
+import '@fortawesome/fontawesome-free/js/all.js';
+import styles from './app.module.css';
+import React, { useEffect, useState } from 'react';
+import VideoList from './components/video_list/video_list';
+import SearchHeader from './components/search_header/search_header';
 
-function App() {
+function App({ youtube }) {
   const [videos, setVideos] = useState([]);
 
-  useEffect(() => {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+  const search = (query) => {
+    youtube
+      .search(query) //
+      .then((videos) => setVideos(videos));
+  };
 
-    fetch(
-      "https://youtube.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=25&key=AIzaSyAxsnLP-oBAqqnF1G1F4TL5wiM9Q2hrJYc",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => setVideos(result.items))
-      .catch((error) => console.log("error", error));
+  useEffect(() => {
+    youtube
+      .mostPopular() //
+      .then((videos) => setVideos(videos));
   }, []);
 
   return (
-    <>
-      <header className="header">
-        <a href="/" className="logo">
-          <div className="logoImg">
-            <i className="fab fa-youtube"></i>
-          </div>
-          <h1 className="logoTitle">Youtube</h1>
-        </a>
-        <form className="search">
-          <input type="text" className="searchInput" placeholder="Search.." />
-          <button type="submit" className="searchBtn">
-            <i className="fas fa-search"></i>
-          </button>
-        </form>
-      </header>
+    <div className={styles.app}>
+      <SearchHeader onSearch={search} />
       <VideoList videos={videos} />
-    </>
+    </div>
   );
 }
 
